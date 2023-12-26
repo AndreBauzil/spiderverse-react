@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import './globals.scss'
 
 export const metadata: Metadata = {
   title: 'SpiderVerse',
