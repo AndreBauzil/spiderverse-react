@@ -15,7 +15,7 @@ export default function HeroesList({ heroes }: IProps) {
       <h1 className={`${spidermanFont.className} ${styles.title}`}>PERSONAGENS</h1>
       <section className={styles.heroes}>
         {heroes.map(hero => (
-          <div key={hero.id}>
+          <div key={hero.id} className={`${styles.imageContainer} ${styles[hero.id]}`}>
             <HeroPicture hero={hero} />
           </div>
         ))}
