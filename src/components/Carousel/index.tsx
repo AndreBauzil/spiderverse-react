@@ -35,6 +35,22 @@ export default function Carousel({ heroes, activeId }: IProps) {
     setVisibileItems(visibileItems)
   }, [heroes, activeIndex])
 
+  useEffect(() => {
+    const htmlEl = document.querySelector("html")
+
+    if (!htmlEl || !visibileItems) return;
+
+    const currentHeroId = visibileItems[enPosition.MIDDLE].id;
+    htmlEl.style.backgroundImage = `url("/spiders/${currentHeroId}-background.png")`;
+
+    htmlEl.classList.add("hero-page");
+
+    return () => {
+      htmlEl.classList.remove("hero-page");
+    }
+  }, [visibileItems])
+
+
   // Changes active hero on carousel
   // newDirection = +1, rotates clockwise
   // newDirection = -1, rotates anti-clockwise
