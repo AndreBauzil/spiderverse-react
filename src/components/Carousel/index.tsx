@@ -26,6 +26,8 @@ export default function Carousel({ heroes, activeId }: IProps) {
   const [activeIndex, setActiveIndex] = useState<number>(
     heroes.findIndex((hero) => hero.id === activeId) - 1
   )
+  const [startInteractionPosition, setStartInteractionPosition] =
+    useState<number>(0)
 
   const transitionAudio = useMemo(() => new Audio("/songs/transition.mp3"), [])
   const voicesAudio: Record<string, HTMLAudioElement> = useMemo(
@@ -79,11 +81,42 @@ export default function Carousel({ heroes, activeId }: IProps) {
     }
   }, [visibileItems])
 
+  // mouse poitner interaction
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    setStartInteractionPosition(e.clientX)
+  }
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    if (!startInteractionPosition) return null;
+
+    const endInteractionPosition = e.clientX;
+    const diffPosition = endInteractionPosition - startInteractionPosition;
+    // diffPosition > 0 => RtL
+    // diffPosition < 0 => LtR
+    const newPosition = diffPosition > 0 ? -1 : 1;
+    handleChangeActiveIndex(newPosition)
+  }
   // Changes active hero on carousel
-  // newDirection = +1, rotates clockwise
-  // newDirection = -1, rotates anti-clockwise
   const handleChangeActiveIndex = (newDirection: number) => {
     setActiveIndex((prevActiveIndex) => prevActiveIndex + newDirection)
+  }
+
+  // touch interaction
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setStartInteractionPosition(e.touches[0].clientX)
+  }
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!startInteractionPosition) return null;
+
+    handleChangeDragTouch(e.changedTouches[0].clientX)
+  }
+  const handleChangeDragTouch = (clientX: number) => {
+    const endInteractionPosition = clientX;
+    const diffPosition = endInteractionPosition - startInteractionPosition;
+
+    // diffPosition > 0 => RtL
+    // diffPosition < 0 => LtR
+    const newPosition = diffPosition > 0 ? -1 : 1;
+    handleChangeActiveIndex(newPosition)
   }
 
   // validate before update useEffect
@@ -93,7 +126,13 @@ export default function Carousel({ heroes, activeId }: IProps) {
     <>
       <div className={styles.container}>
         <div className={styles.carousel}>
-          <div className={styles.wrapper} onClick={() => handleChangeActiveIndex(1)}>
+          <div
+            className={styles.wrapper}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <AnimatePresence mode="popLayout">
               {visibileItems.map((item, position) => (
                 <motion.div
