@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+![Cover (2)](https://github.com/AndreBauzil/spiderverse-react/assets/89871705/62f4263a-1543-4433-b3f6-f3c00e4ab9d7)
 
-## Getting Started
 
-First, run the development server:
+# Spider-Verse Project
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The project is an interactive application inspired by the Spider-Man universe, using the main front-end stacks: React, Next.js 13, Framer Motion library, Sass, and TypeScript to create an incredible visual project with high performance.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[Project Demo.webm](https://github.com/AndreBauzil/spiderverse-react/assets/89871705/953d29a2-d103-4b7c-ae8a-59c858824e36)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 💻 Technologies used in the project
 
-## Learn More
+- [React.js](https://reactjs.org) (v18)
+- [Next.js](https://nextjs.org) (v13)
+- [TypeScript](https://www.typescriptlang.org) (v5)
+- [ESLint](https://eslint.org)
+- [Framer Motion](https://www.framer.com/api/motion)
+- [SASS](https://sass-lang.com)
 
-To learn more about Next.js, take a look at the following resources:
+## 🎨 Project Prototype
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+[Click here](https://www.figma.com/file/rgHS7o5MyTAxk9vCRH5YhL/Landpage-%2B-Mobile---SpiderVerse?type=design&node-id=0%3A1&mode=design&t=5SFRyEJyIbhD90Sl-1) to view the project prototype on Figma.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## 🗄️ Folder structure
 
-## Deploy on Vercel
+The project is structured as follows:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- 📁 `public`
+  - 📁 `icons`
+  - 📁 `songs`
+  - 📁 `spiders`
+- 📁 `src`
+  - 📁 `app`
+    - 📁 `api`
+      - 📁 `heroes`
+    - 📁 `hero`
+      - 📁 `[id]`
+  - 📁 `components`
+    - 📁 `Carousel`
+    - 📁 `HeroDetails`
+    - 📁 `HeroesList`
+    - 📁 `HeroPicture`
+  - 📁 `fonts`
+  - 📁 `interfaces`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 🛠️ Execution instructions
+
+Follow the instructions below to run the project on your local environment:
+
+1. Ensure that you have Node.js installed on your computer. You can download the latest version of Node.js at https://nodejs.org.
+
+2. Clone this repository to your computer or download the source code.
+
+3. Open the terminal and navigate to the project's root directory.
+
+4. Install project dependencies by running the following commands in the terminal:
+
+    ```bash
+    yarn install
+    ```
+
+5. After the dependencies installation is complete, start the local development server with the command:
+
+    ```bash
+    yarn dev
+    ```
+
+6. The local server will start, and you can access the project in your browser at the following address:
+
+    ```bash
+    http://localhost:3000
+    ```
+
+If port 3000 is in use, Next.js will automatically use the next available port on your machine.
+
+If you want to change the default port the application will attempt to use, you can modify the port in the `next.config.js` file.
+
+Now you're ready to explore the project in your local environment!
