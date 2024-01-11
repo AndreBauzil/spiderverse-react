@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import HeroDetails from "../HeroDetails";
 import HeroPicture from "../HeroPicture";
 
-import styles from "./Carousel.module.scss"
+import styles from "./carousel.module.scss"
 
 import { IHeroData } from "@/interfaces/heroes";
 
