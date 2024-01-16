@@ -13,6 +13,8 @@ async function getHeroesData(): Promise<{ data: IHeroData[] }> {
   return await res.json()
 }
 
+export const runtime = "edge"
+
 export default async function Home() {
   const heroes = await getHeroesData();
 
