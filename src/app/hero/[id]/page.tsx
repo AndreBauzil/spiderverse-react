@@ -7,37 +7,18 @@ interface IProps {
   }
 }
 
-async function getHeroesData(): Promise<IHeroData[]> {
+async function getHeroesData(): Promise<{ data: IHeroData[] }> {
   const res = await fetch(`${process.env.DOMAIN_ORIGIN}/api/heroes`)
 
   if (!res.ok) {
     throw new Error("Failed to request heroes list")
   }
 
-  console.log(res.json());
-
-
   return res.json()
 }
 
-export default async function Hero({ params: { id }, heroesData }: { params: { id: string }, heroesData: IHeroData[] }) {
+export default async function Hero({ params: { id } }: IProps) {
   const heroes = await getHeroesData();
 
-  return <Carousel heroes={heroesData} activeId={id} />
-}
-
-export async function generateStaticParams(): Promise<GetStaticPathsResult> {
-  const heroes = await getHeroesData()
-
-  const paths = heroes.map(hero => ({
-    params: { id: hero.id.toString() },
-  }))
-
-  console.log(paths);
-
-
-  return {
-    paths,
-    fallback: false,
-  };
+  return <Carousel heroes={heroes.data} activeId={id} />
 }
