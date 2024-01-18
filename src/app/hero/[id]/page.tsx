@@ -1,5 +1,3 @@
-"use client"
-
 import Carousel from "@/components/Carousel";
 import { IHeroData } from "@/interfaces/heroes";
 
