@@ -1,0 +1,84 @@
+# Nome do seu workflow. Ele aparecerá na aba "Actions" do seu repositório.
+name: Deploy Next.js site to Pages
+
+on:
+  # Executa em pushes direcionados à branch 'main'.
+  push:
+    branches: ["main"]
+
+  # Permite que você execute este workflow manualmente a partir da aba "Actions".
+  workflow_dispatch:
+
+# Define as permissões do GITHUB_TOKEN para permitir o deploy no GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Permite apenas um deploy simultâneo.
+# Isso evita que um novo push cancele um deploy de produção que já está em andamento.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Job de Build: responsável por construir o site estático.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Faz o checkout do seu código para que o workflow possa acessá-lo.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Configura o ambiente do GitHub Pages.
+      #    Este passo é CRUCIAL. Ele injeta automaticamente o `basePath` no seu Next.js
+      #    (ex: /spiderverse-react), garantindo que os links para CSS, JS e imagens
+      #    funcionem corretamente no site publicado.
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          static_site_generator: next
+
+      # 3. Configura o Node.js na versão 20 e habilita o cache para o Yarn.
+      #    O cache acelera os builds futuros, pois não será necessário baixar as dependências novamente.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'yarn'
+
+      # 4. Instala as dependências do projeto usando Yarn.
+      - name: Install Dependencies
+        run: yarn install
+
+      # 5. Executa o script de build do Next.js.
+      #    Como seu `next.config.mjs` tem `output: 'export'`, este comando
+      #    gerará os arquivos estáticos na pasta `./out`.
+      - name: Build with Next.js
+        run: yarn build
+
+      # 6. Faz o upload do artefato (a pasta `./out` com o site estático) para o GitHub Pages.
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # O caminho para a pasta que contém os arquivos do site estático.
+          path: ./out
+
+  # Job de Deploy: responsável por publicar o site no GitHub Pages.
+  deploy:
+    # Define o ambiente de deploy.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # A URL do site será exibida aqui.
+    
+    # Executa este job no Ubuntu.
+    runs-on: ubuntu-latest
+    
+    # Garante que o job de 'build' tenha sido concluído com sucesso antes de iniciar.
+    needs: build
+    
+    steps:
+      # Publica o artefato que foi gerado no job de 'build' para o GitHub Pages.
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
