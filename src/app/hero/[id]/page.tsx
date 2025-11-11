@@ -8,17 +8,18 @@ interface IProps {
 }
 
 async function getHeroesData(): Promise<{ data: IHeroData[] }> {
-  const res = await fetch('/api/heroes');
+  const baseUrl = process.env.DOMAIN_ORIGIN || 'http://localhost:3000';
+  const res = await fetch(`/api/heroes`);
 
   if (!res.ok) {
-    throw new Error("Failed to request heroes list")
+    throw new Error("Failed to request heroes list");
   }
-
-  return res.json()
+  return res.json();
 }
 
-export default async function Hero({ params: { id } }: IProps) {
-  const heroes = await getHeroesData();
+export default async function Hero(props: IProps) {
+  const { id } = await props.params;
+  const allHeroes = await getHeroesData();
 
-  return <Carousel heroes={heroes.data} activeId={id} />
+  return <Carousel heroes={allHeroes.data} activeId={id} />
 }
