@@ -26,8 +26,8 @@ export default function Carousel({ heroes, activeId }: IProps) {
   const [activeIndex, setActiveIndex] = useState<number>(
     heroes.findIndex((hero) => hero.id === activeId) - 1
   )
-  const [startInteractionPosition, setStartInteractionPosition] =
-    useState<number>(0)
+  const [isDragging, setIsDragging] = useState(false);
+  const [startInteractionPosition, setStartInteractionPosition] = useState<number>(0);
 
   const transitionAudio = useMemo(() => new Audio("/songs/transition.mp3"), [])
   const voicesAudio: Record<string, HTMLAudioElement> = useMemo(
@@ -82,23 +82,35 @@ export default function Carousel({ heroes, activeId }: IProps) {
   }, [visibileItems])
 
   // mouse poitner interaction
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    setStartInteractionPosition(e.clientX)
-  }
-  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    if (!startInteractionPosition) return null;
-
-    const endInteractionPosition = e.clientX;
-    const diffPosition = endInteractionPosition - startInteractionPosition;
-    // diffPosition > 0 => RtL
-    // diffPosition < 0 => LtR
-    const newPosition = diffPosition > 0 ? -1 : 1;
-    handleChangeActiveIndex(newPosition)
-  }
-  // Changes active hero on carousel
   const handleChangeActiveIndex = (newDirection: number) => {
-    setActiveIndex((prevActiveIndex) => prevActiveIndex + newDirection)
-  }
+    setActiveIndex((prevActiveIndex) => prevActiveIndex + newDirection);
+  };
+
+  const handleInteractionStart = (clientX: number) => {
+    setIsDragging(true);
+    setStartInteractionPosition(clientX);
+  };
+
+  const handleInteractionEnd = (clientX: number) => {
+    if (!isDragging || !startInteractionPosition) return;
+
+    const endInteractionPosition = clientX;
+    const diffPosition = endInteractionPosition - startInteractionPosition;
+
+    // Adiciona uma "deadzone" de 50px para evitar cliques acidentais
+    if (Math.abs(diffPosition) > 50) {
+      const newPosition = diffPosition > 0 ? -1 : 1; // RtL ou LtR
+      handleChangeActiveIndex(newPosition);
+    }
+    
+    setIsDragging(false);
+    setStartInteractionPosition(0);
+  };
+
+  // Previne "arrastar fantasma" no Firefox e Safari
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
 
   // touch interaction
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
@@ -128,10 +140,14 @@ export default function Carousel({ heroes, activeId }: IProps) {
         <div className={styles.carousel}>
           <div
             className={styles.wrapper}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
+            onMouseDown={(e) => handleInteractionStart(e.clientX)}
+            onMouseUp={(e) => handleInteractionEnd(e.clientX)}
+            onMouseLeave={(e) => handleInteractionEnd(e.clientX)} 
+            
+            onTouchStart={(e) => handleInteractionStart(e.touches[0].clientX)}
+            onTouchEnd={(e) => handleInteractionEnd(e.changedTouches[0].clientX)}
+
+            onDragStart={handleDragStart} 
           >
             <AnimatePresence mode="popLayout">
               {visibileItems.map((item, position) => (

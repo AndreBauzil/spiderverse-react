@@ -1,4 +1,3 @@
-"use client"
 
 import styles from './page.module.scss'
 
@@ -6,7 +5,7 @@ import HeroesList from "@/components/HeroList";
 import { IHeroData } from "@/interfaces/heroes";
 
 async function getHeroesData(): Promise<{ data: IHeroData[] }> {
-  const res = await fetch(`${process.env.DOMAIN_ORIGIN}/api/heroes`)
+  const res = await fetch(`/api/heroes`);
 
   if (!res.ok) {
     throw new Error("Failed to request heroes list")
