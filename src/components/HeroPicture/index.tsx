@@ -27,6 +27,7 @@ interface IProps {
 export default function HeroPicture({ hero }: IProps) {
   return (
     <Image
+      draggable='false'
       src={heroesImage[hero.id]}
       alt={`${hero.id} (Universo-${hero.universe})`}
       priority

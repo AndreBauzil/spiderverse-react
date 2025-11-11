@@ -31,4 +31,10 @@ header {
   margin: 3rem 3rem 0;
   position: relative;
   z-index: 4;
+
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
