@@ -8,7 +8,6 @@ interface IProps {
 }
 
 async function getHeroesData(): Promise<{ data: IHeroData[] }> {
-  const baseUrl = process.env.DOMAIN_ORIGIN || 'http://localhost:3000';
   const res = await fetch(`/api/heroes`);
 
   if (!res.ok) {
