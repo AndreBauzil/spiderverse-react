@@ -8,7 +8,7 @@ interface IProps {
 }
 
 async function getHeroesData(): Promise<{ data: IHeroData[] }> {
-  const res = await fetch(`/api/heroes`);
+  const res = await fetch(`${process.env.API_URL}/api/heroes`);
 
   if (!res.ok) {
     throw new Error("Failed to request heroes list");
