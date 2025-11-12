@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import HeroDetails from "../HeroDetails";
@@ -23,15 +23,26 @@ interface IProps {
 
 export default function Carousel({ heroes, activeId }: IProps) {
   const [visibileItems, setVisibileItems] = useState<IHeroData[] | null>(null)
-  const [activeIndex, setActiveIndex] = useState<number>(
-    heroes.findIndex((hero) => hero.id === activeId) - 1
-  )
+  const [activeIndex, setActiveIndex] = useState<number>(() => {
+    if (!heroes || heroes.length === 0) {
+      return 0;
+    }
+    const index = heroes.findIndex((hero) => hero.id === activeId);
+    
+    return index !== -1 ? index - 1 : 0;
+  });
+
   const [isDragging, setIsDragging] = useState(false);
   const [startInteractionPosition, setStartInteractionPosition] = useState<number>(0);
 
-  const transitionAudio = useMemo(() => new Audio("/songs/transition.mp3"), [])
-  const voicesAudio: Record<string, HTMLAudioElement> = useMemo(
-    () => ({
+  const [transitionAudio, setTransitionAudio] = useState<HTMLAudioElement | null>(null);
+  const [voicesAudio, setVoicesAudio] = useState<Record<string, HTMLAudioElement> | null>(null);
+
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    setTransitionAudio(new Audio("/songs/transition.mp3"));
+    setVoicesAudio({
       "spider-man-616": new Audio("/songs/spider-man-616.mp3"),
       "spider-woman-65": new Audio("/songs/spider-woman-65.mp3"),
       "spider-man-1610": new Audio("/songs/spider-man-1610.mp3"),
@@ -39,25 +50,31 @@ export default function Carousel({ heroes, activeId }: IProps) {
       "spider-ham-8311": new Audio("/songs/spider-ham-8311.mp3"),
       "spider-man-90214": new Audio("/songs/spider-man-90214.mp3"),
       "spider-man-928": new Audio("/songs/spider-man-928.mp3")
-    }),
-    []
-  )
+    });
+  }, [])
 
   // for heroes' audios and transisiton
   useEffect(() => {
-    if (!visibileItems) return
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    if (!visibileItems || !transitionAudio || !voicesAudio) return;
 
     transitionAudio.play();
 
-    const voiceAudio = voicesAudio[visibileItems[enPosition.MIDDLE].id]
-    if (!voiceAudio) return
+    const voiceAudio = voicesAudio[visibileItems[enPosition.MIDDLE].id];
+    if (!voiceAudio) return;
 
     voiceAudio.volume = 0.1;
-    voiceAudio.play()
-  }, [visibileItems, transitionAudio, voicesAudio])
+    voiceAudio.play();
+  }, [visibileItems, transitionAudio, voicesAudio]);
 
   // for visibile heroes on screen
   useEffect(() => {
+    if (!heroes || heroes.length === 0) return;
+
     // Function to loop over hero list, also dont pass the array max length
     const indexOnArrayScope = ((activeIndex % heroes.length) + heroes.length) % heroes.length;
 
@@ -67,13 +84,21 @@ export default function Carousel({ heroes, activeId }: IProps) {
 
   // for heroes' background image
   useEffect(() => {
-    const htmlEl = document.querySelector("html")
+    // Adicionamos 'guard' para 'heroes'
+    if (!heroes || heroes.length === 0) return;
 
+    const indexOnArrayScope = ((activeIndex % heroes.length) + heroes.length) % heroes.length;
+    const visibileItems = [...heroes, ...heroes].slice(indexOnArrayScope, indexOnArrayScope + 3)
+    setVisibileItems(visibileItems)
+  }, [heroes, activeIndex])
+
+  // useEffect para o background
+  useEffect(() => {
+    const htmlEl = document.querySelector("html")
     if (!htmlEl || !visibileItems) return;
 
     const currentHeroId = visibileItems[enPosition.MIDDLE].id;
     htmlEl.style.backgroundImage = `url("/spiders/${currentHeroId}-background.png")`;
-
     htmlEl.classList.add("hero-page");
 
     return () => {
@@ -93,13 +118,11 @@ export default function Carousel({ heroes, activeId }: IProps) {
 
   const handleInteractionEnd = (clientX: number) => {
     if (!isDragging || !startInteractionPosition) return;
-
     const endInteractionPosition = clientX;
     const diffPosition = endInteractionPosition - startInteractionPosition;
 
-    // Adiciona uma "deadzone" de 50px para evitar cliques acidentais
     if (Math.abs(diffPosition) > 50) {
-      const newPosition = diffPosition > 0 ? -1 : 1; // RtL ou LtR
+      const newPosition = diffPosition > 0 ? -1 : 1; 
       handleChangeActiveIndex(newPosition);
     }
     
@@ -107,26 +130,20 @@ export default function Carousel({ heroes, activeId }: IProps) {
     setStartInteractionPosition(0);
   };
 
-  // Previne "arrastar fantasma" no Firefox e Safari
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
 
-  // touch interaction
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setStartInteractionPosition(e.touches[0].clientX)
   }
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!startInteractionPosition) return null;
-
     handleChangeDragTouch(e.changedTouches[0].clientX)
   }
   const handleChangeDragTouch = (clientX: number) => {
     const endInteractionPosition = clientX;
     const diffPosition = endInteractionPosition - startInteractionPosition;
-
-    // diffPosition > 0 => RtL
-    // diffPosition < 0 => LtR
     const newPosition = diffPosition > 0 ? -1 : 1;
     handleChangeActiveIndex(newPosition)
   }
@@ -160,7 +177,6 @@ export default function Carousel({ heroes, activeId }: IProps) {
                     x: -300,
                     opacity: 0,
                     scale: 1,
-                    left: "-20%"
                   }}
                   transition={{ duration: 0.8 }}
                 >

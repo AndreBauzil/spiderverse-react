@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import './globals.scss'
 
 import menu from "@public/icons/menu.svg"
 import user from "@public/icons/user.svg"
 import spiderlogo from '@public/spider-logo.svg'
-import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'SpiderVerse',
@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body>
         <header draggable='false'>
-          <Image src={menu} alt='Menu options' width={36} height={25} />
+          <Image src={menu} priority alt='Menu options' width={36} height={25} />
           <Link draggable='false' href={'/'}>
             <Image
               draggable='false'
